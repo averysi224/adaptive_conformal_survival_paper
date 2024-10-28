@@ -2,7 +2,10 @@
 cfsurv_c <- function(x,
                      Xtrain, C, event, time,
                      alpha=0.05,
-                     I_fit = NULL,mdl0
+                     I_fit = NULL,
+                     # mdl0,
+                     event.control,
+                     censor.control
 ){
 
   ## Process the input
@@ -39,12 +42,15 @@ cfsurv_c <- function(x,
   }
   data_fit <- data[I_fit,]
   data_calib <- data[-I_fit,]
-  
+
   ## Run the main function with Cox base algorithm
   res <- cox_based(x, alpha,
                    data_fit,
                    data_calib,
-                   dist, mdl0)
+                   dist, 
+                   # mdl0,
+                   event.control,
+                   censor.control)
   
 
   return(res)

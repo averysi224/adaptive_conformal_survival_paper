@@ -127,33 +127,39 @@ censoring_prob <- function(fit, calib, test=NULL,
   return(list(pr_fit = pr_fit, pr_calib = pr_calib, pr_new = pr_new))
 }
 
-cens_prob <- function(mdl, calib, test=NULL,
-                      method="gpr",
-                      xnames, c,
-                      ftol=.1, tol=.1, n.tree = 40){
-  
-  p <- length(xnames)
-  gpr_mdl = mdl
-  ## Computing the censoring scores for the calibration data
-  mean_calib <- gpr_mdl$predict(as.matrix(calib[,names(calib) %in% xnames]))
-  sd_calib <- gpr_mdl$predict(as.matrix(calib[,names(calib) %in% xnames]),
-                              se.fit = TRUE)$se
-  
-  pr_calib <- pnorm((-c - mean_calib) / sd_calib)
-  
-  ## Computing the censoring scores for the test data
-  if(!is.null(test)){
-    newdata <- data.frame(test)
-    colnames(newdata) <- xnames
-    mean_new <- gpr_mdl$predict(newdata[,names(newdata) %in% xnames])
-    sd_new <- gpr_mdl$predict(newdata[,names(newdata) %in% xnames],
-                              se.fit = TRUE)$se
-    
-    pr_new <- pnorm((-c - mean_new) / sd_new)
-    
-  }else{pr_new=NULL}
-  return(list(pr_calib = pr_calib, pr_new = pr_new))
+left.shift.censoring<-function(time,status){
+    epsilon<-time%>%unique%>%sort%>%diff%>%min
+    epsilon<-min(epsilon*.5,1e-5)
+    time[status==0]<-time[status==0]-epsilon
+    time
 }
+# cens_prob <- function(mdl, calib, test=NULL,
+#                       method="gpr",
+#                       xnames, c,
+#                       ftol=.1, tol=.1, n.tree = 40){
+  
+#   p <- length(xnames)
+#   gpr_mdl = mdl
+#   ## Computing the censoring scores for the calibration data
+#   mean_calib <- gpr_mdl$predict(as.matrix(calib[,names(calib) %in% xnames]))
+#   sd_calib <- gpr_mdl$predict(as.matrix(calib[,names(calib) %in% xnames]),
+#                               se.fit = TRUE)$se
+  
+#   pr_calib <- pnorm((-c - mean_calib) / sd_calib)
+  
+#   ## Computing the censoring scores for the test data
+#   if(!is.null(test)){
+#     newdata <- data.frame(test)
+#     colnames(newdata) <- xnames
+#     mean_new <- gpr_mdl$predict(newdata[,names(newdata) %in% xnames])
+#     sd_new <- gpr_mdl$predict(newdata[,names(newdata) %in% xnames],
+#                               se.fit = TRUE)$se
+    
+#     pr_new <- pnorm((-c - mean_new) / sd_new)
+    
+#   }else{pr_new=NULL}
+#   return(list(pr_calib = pr_calib, pr_new = pr_new))
+# }
 
 
 #' Computing the calibration term with covaraite shift

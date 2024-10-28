@@ -15,6 +15,15 @@ suppressPackageStartupMessages(library(quantreg))
 suppressPackageStartupMessages(library(GauPro))
 suppressPackageStartupMessages(library(gbm))
 suppressPackageStartupMessages(library(grf))
+suppressPackageStartupMessages(library(assertthat))
+suppressPackageStartupMessages(library(matrixStats))
+suppressPackageStartupMessages(library(SuperLearner))
+suppressPackageStartupMessages(library(survSuperLearner))
+suppressPackageStartupMessages(library(glmnet))
+suppressPackageStartupMessages(library(xgboost))
+suppressPackageStartupMessages(library(randomForestSRC))
+
+suppressPackageStartupMessages(library(flexsurv))
 ## suppressPackageStartupMessages(library(caret))
 
 ########################################
@@ -38,8 +47,8 @@ setting_list = c("ld_setting1",
 
 ## parameters
 alpha <- .1    # target level 1-alpha
-n <- 1000
-n_test <- 5000
+n <- 200
+n_test <- n
 n_train <- n
 n_calib <- n
 xmin <- 0 
@@ -56,7 +65,7 @@ for(setting in setting_list){
   simures <- simu(seed + 1234, setting, n, p, 
                    n_train, n_calib, n_test, 
                    beta, xmin, xmax, 
-                   exp_rate, alpha, "cox") 
+                   exp_rate, alpha, "survSuperLearner") 
    save_dir <- sprintf("../results/%s_seed_%d.csv", setting, seed)
    write.csv(simures, save_dir)
 }
